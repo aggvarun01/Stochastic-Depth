@@ -71,7 +71,7 @@ def conv_block(inputs, output_size, first_kernel_size, first_stride,
     return conv
 
 
-def residual_block(inputs, output_size, survival_rate, random_roll,
+def residual_block(inputs, output_size, survival_rate,
                    is_training, scope):
     '''
     -> conv_block -> + -> relu
@@ -95,11 +95,11 @@ def residual_block(inputs, output_size, survival_rate, random_roll,
     ------
     tensor with shape "NHWC"
     '''
-
     with tf.variable_scope(scope, reuse=tf.AUTO_REUSE):
 
         identity = inputs
 
+        random_roll = tf.random_uniform(shape=[], minval=0.0, maxval=1.0)
         survives = tf.less(random_roll, survival_rate)
 
         conv = tf.cond(tf.logical_and(is_training, tf.logical_not(survives)),
@@ -117,7 +117,7 @@ def residual_block(inputs, output_size, survival_rate, random_roll,
         return tf.nn.relu(conv + identity)
 
 
-def transition_block(inputs, output_size, survival_rate, random_roll,
+def transition_block(inputs, output_size, survival_rate,
                      is_training, scope, strategy='pad'):
     '''
     -> conv_block - - - - > + -> relu
@@ -169,6 +169,7 @@ def transition_block(inputs, output_size, survival_rate, random_roll,
             identity = tf.pad(identity,
                               paddings)
 
+        random_roll = tf.random_uniform(shape=[], minval=0.0, maxval=1.0)
         survives = tf.less(random_roll, survival_rate)
 
         conv = tf.cond(tf.logical_and(is_training, tf.logical_not(survives)),
@@ -209,7 +210,7 @@ def output_layer(inputs, scope, output_size=10):
     return out
 
 
-def architecture(inputs, random_rolls, is_training, strategy, P=0.5, L=54,
+def architecture(inputs, is_training, strategy, P=0.5, L=54,
                  scope='stoch_depth'):
     '''
     Builds the stochastic depth network. Current implementation consists of 3 stacks
@@ -243,32 +244,27 @@ def architecture(inputs, random_rolls, is_training, strategy, P=0.5, L=54,
         with tf.variable_scope('stack1', reuse=tf.AUTO_REUSE):
             for i in range(res_per_stack):
                 out = residual_block(inputs=out, output_size=16, survival_rate=survival_rates[l],
-                                     random_roll=random_rolls[l], is_training=is_training,
-                                     scope='res'+str(i))
+                                     is_training=is_training, scope='res'+str(i))
                 l += 1
 
         with tf.variable_scope('stack2', reuse=tf.AUTO_REUSE):
             out = transition_block(inputs=out, output_size=32, survival_rate=survival_rates[l],
-                                   random_roll=random_rolls[l], is_training=is_training,
-                                   scope='res'+str(0), strategy=strategy)
+                                   is_training=is_training, scope='res'+str(0), strategy=strategy)
             l += 1
 
             for i in range(1, res_per_stack):
                 out = residual_block(inputs=out, output_size=32, survival_rate=survival_rates[l],
-                                     random_roll=random_rolls[l], is_training=is_training,
-                                     scope='res'+str(i))
+                                     is_training=is_training, scope='res'+str(i))
                 l += 1
 
         with tf.variable_scope('stack3', reuse=tf.AUTO_REUSE):
             out = transition_block(inputs=out, output_size=64, survival_rate=survival_rates[l],
-                                   random_roll=random_rolls[l], is_training=is_training,
-                                   scope='res'+str(0), strategy=strategy)
+                                   is_training=is_training, scope='res'+str(0), strategy=strategy)
             l += 1
 
             for i in range(1, res_per_stack):
                 out = residual_block(inputs=out, output_size=64, survival_rate=survival_rates[l],
-                                     random_roll=random_rolls[l], is_training=is_training,
-                                     scope='res'+str(i))
+                                     is_training=is_training, scope='res'+str(i))
                 l += 1
 
         out = output_layer(out, scope='out', output_size=10)

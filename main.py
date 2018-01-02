@@ -52,7 +52,6 @@ print('Test labels shape', y_test.shape)
 
 
 X_inputs = tf.placeholder(dtype=tf.float32, shape=[None, 32, 32, 3])
-random_rolls = tf.placeholder(dtype=tf.float32, shape=[54])
 y_inputs = tf.placeholder(dtype=tf.uint8, shape=[None])
 is_training = tf.placeholder(dtype=tf.bool)
 y_test_tf = tf.placeholder(dtype=tf.int64, shape=[None])
@@ -75,7 +74,7 @@ shuffle_indices = np.arange(train_size)
 
 labels = tf.one_hot(y_inputs, 10)
 
-out = architecture(X_inputs, random_rolls, is_training, strategy='pad',
+out = architecture(X_inputs, is_training, strategy='pad',
                    scope='stoch_depth', P=0.5, L=54)
 
 loss = loss_function(logits=out, labels=labels, weight_decay=weight_decay,
@@ -138,10 +137,8 @@ with tf.Session() as sess:
                 if flip_bool:
                     X_train_batch[inx] = np.flip(X_train_batch[inx], axis=1)
 
-            random_rolls_batch = np.random.uniform(size=54)
             _, loss_val, train_summ = sess.run([step, loss, training_summary],
                                                feed_dict={X_inputs: X_train_batch,
-                                                          random_rolls: random_rolls_batch,
                                                           y_inputs: y_train_batch,
                                                           is_training: True})
         writer.add_summary(train_summ, epoch)
@@ -154,7 +151,6 @@ with tf.Session() as sess:
             X_test_batch, y_test_batch = X_test[indices_test], y_test[indices_test]
 
             test_batch_accuracy = sess.run(error_num, feed_dict={X_inputs: X_test_batch,
-                                                                 random_rolls: random_rolls_batch,
                                                                  y_test_tf: y_test_batch,
                                                                  is_training: False})
             scores_list.append(test_batch_accuracy)
