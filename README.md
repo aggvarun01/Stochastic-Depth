@@ -7,14 +7,14 @@ The code has been tested on a Tesla-K80 GPU, where one epoch takes ~200 seconds 
 
 # Getting Started on CIFAR-10
 ```bash
-git clone https://github.com/anujk3/Stochastic_Depth_ECBM4040.git
-cd Stochastic_Depth_ECBM4040
+git clone https://github.com/aggvarun01/Stochastic-Depth.git
+cd Stochastic-Depth
 python main.py
 ```
 Alternatively, the code can be run from inside the jupyter notebook `main.ipynb`.
 
 The model can be run on the CIFAR-10 out of the box. It will checkpoint the model at every 10th epoch. Additionally, it will write the training loss and test error at the end of each epoch to TensorBoard which can be visualized using the following code:
 ```bash
-cd Stochastic_Depth_ECBM4040
+cd Stochastic-Depth
 tensorboard --logdir="tf_logs/"
 ```
