@@ -13,7 +13,7 @@ python main.py
 ```
 Alternatively, the code can be run from inside the jupyter notebook `main.ipynb`.
 
-The model can be run on the CIFAR-10 out of the box. It will checkpoint the model at every 10th epoch. Additionally, it will write the training loss and test error at the end of each epoch to TensorBoard which can be visualized using the following code:
+The model can be run on the CIFAR-10 out of the box. It will checkpoint the model at intervals of 10 epochs. Additionally, it will write the training loss and test error at the end of each epoch to TensorBoard which can be visualized using the following code:
 ```bash
 cd Stochastic-Depth
 tensorboard --logdir="tf_logs/"
