@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 # ECBM E4040 Neural Networks and Deep Learning
-# This is a utility function to help you download the dataset and preprocess the data we use for this homework.
-# requires several modules: _pickle, tarfile, glob. If you don't have them, search the web on how to install them.
-# You are free to change the code as you like.
+# This is a utility function to help you download the dataset and preprocess the data
 
-# Import modules. If you don't have them, try `pip install xx` or `conda
-# install xx` in your console.
 import _pickle as pickle
 import os
 import tarfile
